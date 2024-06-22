@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscription</title>
+    <style>
+.container {
+    width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], select {
+    width: 50%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+button {
+  background-color:#A9ACAF; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 40px 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  margin: 2px 18px 6px 2px;
+  cursor: pointer;
+  border-radius: 5px; /* Rounded corners */
+}
+
+button:hover {
+  background-color: #3e8e41; /* Darker green on hover */
+}
+                table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h2><center>Inscription à un stage</center></h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Stage</th>
+                <th>DU</th>
+                <th>AU</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ lien.typestage }}</td>
+                <td>{{ lien.datedebut }}</td>
+                <td>{{ lien.datefin }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="container">
+        <h2>Formulaire de Stage</h2>
+        <form>
+            <div class="form-group">
+                <label for="stagiaire">Sélection Stagiaire:</label>
+                <select id="stagiaire" name="stagiaire" onclick="updateStudentInfo()">
+                    {% for stagiaire in stagiaire %}
+                        <option value="{{ stagiaire.nom }}" prenom="{{ stagiaire.prenom }}">{{ stagiaire.prenom }}</option>
+                    {% endfor %}
+                    <!-- Ajoutez d'autres options si nécessaire -->
+                
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="labels" for="Nom">Nom</label>
+                <input class="inputs" type="text" id="Nom" name="Nom" required>
+              </div>
+              <div class="labelsInputContainer">
+                <label class="labels" for="Prenom">Prenom</label>
+                <input class="inputs" type="text" id="Prenom" name="Prenom" required>
+              </div>
+              <div class="labelsInputContainer">
+                <label class="labels" for="status">Status</label>
+                <select id="status" name="Status">
+                  <option value="CIF">Confirmé</option>
+                  <option value="SIFE">En attente</option>
+                  <option value="Ch.Force">Rejeter</option>
+                </select>
+              </div>
+        </form>
+            <center> <button type="submit">Validation</button>
+            <button><a href="{% url 'stagiaire' %}">Nouvelle Stagiaire</a></button>
+                <button><a href="{% url 'retourdebut' %}">Retour Liste Stage</a></button> </center>
+    </div>
+
+    <script>
+        function updateStudentInfo() {
+          var select = document.getElementById("stagiaire");
+          var selectedOption = select.options[select.selectedIndex];
+      
+          var nomInput = document.getElementById("Nom");
+          var prenomInput = document.getElementById("Prenom");
+      
+          // Clear input fields if no option is selected
+          if (select.selectedIndex === 0) {
+            nomInput.value = "";
+            prenomInput.value = "";
+            return;
+          }
+    
+          // Set Nom and Prenom inputs with selected option's values
+          nomInput.value = selectedOption.value;
+          prenomInput.value = selectedOption.getAttribute("prenom");
+        }
+      
+        // Call the function on initial page load
+        window.onload = updateStudentInfo;
+      
+        // Call the function whenever the selection changes
+        var select = document.getElementById("selection");
+        select.addEventListener("change", updateStudentInfo);
+        
+        function redirectToCrStagiaire(codeStage) {
+            window.location.href = "creationStagiaire.page3?codeStage=" + codeStage;
+        }
+      
+        // Function to redirect to ListByDate.page1
+        function redirectionToStage(codeStage) {
+            window.location.href = "Selection.page1?codeStage=" + codeStage;
+        }
+      </script>
+        
+    </body>
+    </html>

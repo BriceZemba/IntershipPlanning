@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscription</title>
+    <style>
+button {
+  background-color:#A9ACAF; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 40px 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  margin: 2px 18px 6px 2px;
+  cursor: pointer;
+  border-radius: 5px; /* Rounded corners */
+}
+
+button:hover {
+  background-color: #3e8e41; /* Darker green on hover */
+}
+                table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h2><center>Inscription à un stage</center></h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Stage</th>
+                <th>DU</th>
+                <th>AU</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ lien.typestage }}</td>
+                <td>{{ lien.datedebut }}</td>
+                <td>{{ lien.datefin }}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <table border="1px">
+        <thead>
+            <tr bgcolor="#A9ACAF">
+                <th >Nom des Stagiaires</th>
+                <th>Prenom des Stagiaires</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for st in stagiaire %}
+                {% if st.stage == lien.typestage %}
+                    <tr>
+                        <td>{{ st.nom }}</td>
+                        <td> {{ st.prenom }} </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <center>  <button><a href="{% url 'inscrit' lien.typestage  %}">Nouvelle inscription</a></button>
+        <button><a href="{% url 'retourdebut' %}">Retour Liste Stage</a></button>
+        </center>
+    <!-- Afficher d'autres informations du lien si nécessaire -->
+</body>
+</html>

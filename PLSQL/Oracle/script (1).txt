@@ -1,0 +1,124 @@
+-- Fonction pour récupérer les stages par type
+CREATE OR REPLACE FUNCTION get_stages_by_type(type VARCHAR2) RETURN SYS_REFCURSOR AS
+    stage_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN stage_cursor FOR
+    SELECT *
+    FROM STAGE
+    WHERE TYPE_STAGE = type;
+    
+    RETURN stage_cursor;
+END get_stages_by_type;
+/
+
+-- Fonction pour récupérer les stages par date de début
+CREATE OR REPLACE FUNCTION get_stages_by_date RETURN SYS_REFCURSOR AS
+    stage_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN stage_cursor FOR
+    SELECT *
+    FROM STAGE
+    ORDER BY DEBUT_STAGE;
+    
+    RETURN stage_cursor;
+END get_stages_by_date;
+/
+
+-- Procédure pour fermer les inscriptions à un stage
+CREATE OR REPLACE PROCEDURE close_registration(stage_code VARCHAR2) AS
+BEGIN
+    UPDATE STAGE
+    SET NBINSCRIT_STAGE = NBPLACE_STAGE
+    WHERE CODE_STAGE = stage_code;
+END close_registration;
+/
+
+-- Fonction pour récupérer les informations détaillées d'un stage et ses inscrits
+CREATE OR REPLACE FUNCTION get_stage_details(stage_code VARCHAR2) RETURN SYS_REFCURSOR AS
+    stage_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN stage_cursor FOR
+    SELECT s.*, i.*
+    FROM STAGE s
+    JOIN INSCRIPTION i ON s.CODE_STAGE = i.CODE_STAGE
+    WHERE s.CODE_STAGE = stage_code;
+    
+    RETURN stage_cursor;
+END get_stage_details;
+/
+
+-- Procédure pour ajouter une nouvelle inscription à un stage
+CREATE OR REPLACE PROCEDURE add_registration(
+    p_stage_code IN VARCHAR2,
+    p_trainee_num IN VARCHAR2,
+    p_registration_date IN DATE,
+    p_status IN CHAR
+) AS
+BEGIN
+    INSERT INTO INSCRIPTION (CODE_STAGE, NUM_STAGIAIRE, DATE_INSCRIP, STATUT_INSCRIP)
+    VALUES (p_stage_code, p_trainee_num, p_registration_date, p_status);
+END add_registration;
+/
+
+-- Procédure pour mettre à jour le statut d'inscription d'un stagiaire
+CREATE OR REPLACE PROCEDURE update_registration_status(
+    p_stage_code IN VARCHAR2,
+    p_trainee_num IN VARCHAR2,
+    p_status IN CHAR
+) AS
+BEGIN
+    UPDATE INSCRIPTION
+    SET STATUT_INSCRIP = p_status
+    WHERE CODE_STAGE = p_stage_code
+    AND NUM_STAGIAIRE = p_trainee_num;
+END update_registration_status;
+/
+
+-- Fonction pour récupérer tous les stagiaires
+CREATE OR REPLACE FUNCTION get_all_trainees RETURN SYS_REFCURSOR AS
+    trainee_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN trainee_cursor FOR
+    SELECT *
+    FROM STAGIAIRE;
+    
+    RETURN trainee_cursor;
+END get_all_trainees;
+/
+
+-- Procédure pour créer un nouveau stagiaire
+CREATE OR REPLACE PROCEDURE create_trainee(
+    trainee_num IN VARCHAR2,
+    trainee_name IN VARCHAR2,
+    trainee_surname IN VARCHAR2,
+    trainee_sex IN CHAR,
+    trainee_dob IN DATE,
+    trainee_diploma IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO STAGIAIRE (NUM_STAGIAIRE, NOM_STAGIAIRE, PRENOM_STAGIAIRE, SEXE_STAGIAIRE, DNAISS_STAGIAIRE, DIPLO_STAGIAIRE)
+    VALUES (trainee_num, trainee_name, trainee_surname, trainee_sex, trainee_dob, trainee_diploma);
+END create_trainee;
+/
+
+-- Procédure pour valider l'inscription d'un stagiaire à un stage
+CREATE OR REPLACE PROCEDURE validate_registration(
+    p_stage_code IN VARCHAR2,
+    p_trainee_num IN VARCHAR2,
+    p_status IN CHAR
+) AS
+BEGIN
+    -- Incrémente le nombre d'inscrits si le statut est '2' (inscrit)
+    IF p_status = '2' THEN
+        UPDATE STAGE
+        SET NBINSCRIT_STAGE = NBINSCRIT_STAGE + 1
+        WHERE CODE_STAGE = p_stage_code;
+    END IF;
+    
+    -- Insère l'inscription dans la table INSCRIPTION
+    INSERT INTO INSCRIPTION (CODE_STAGE, NUM_STAGIAIRE, DATE_INSCRIP, STATUT_INSCRIP)
+    VALUES (p_stage_code, p_trainee_num, SYSDATE, p_status);
+    
+    COMMIT;
+END validate_registration;
+/
